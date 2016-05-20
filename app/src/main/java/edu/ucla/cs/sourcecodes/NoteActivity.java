@@ -38,13 +38,13 @@ public class NoteActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private ArrayAdapter<String> mAdapter;
     private View mContentView = null;
-    private SessionData sessionData;
+    private SessionDataMap sessionData;
     ListView listView;
     String[] values;
 
     ArrayList<String> array;
 
-    private String file = "mydata";
+    private String file = "mydata2";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,7 @@ public class NoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_textview_note);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        sessionData = new SessionDataMap();
 
         array = new ArrayList<>();
         mContentView = this.findViewById(android.R.id.content).getRootView();
@@ -115,32 +116,29 @@ public class NoteActivity extends AppCompatActivity {
         ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
         File directory = contextWrapper.getDir(file, Context.MODE_PRIVATE);
         File myInternalFile = new File(directory , file);
-        sessionData = null;
 
         if (myInternalFile.exists()) {
             try {
                 String formArray = "";
                 FileInputStream fis = new FileInputStream(myInternalFile);
                 DataInputStream in = new DataInputStream(fis);
-                BufferedReader br =
-                        new BufferedReader(new InputStreamReader(in));
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
                 String strLine;
                 while ((strLine = br.readLine()) != null) {
                     formArray = formArray + strLine;
                 }
                 in.close();
-
                 sessionData = JsonUtil.toSdata(formArray);
-                sessionData.setSessionName("Temp");
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-            // Set array data
-            for (String word : sessionData.getWordList()) {
-                array.add(word);
-            }
+
+            // Get first session from mapping
+            if (sessionData.getLength() > 0)
+                for (String word : sessionData.getFirst().getWordList()) {
+                    array.add(word);
+                }
 
             //set adapter for loaded words
             values = array.toArray(new String[array.size()]);
@@ -169,19 +167,7 @@ public class NoteActivity extends AppCompatActivity {
 
         //create a new toggle to switch focus if the menu is slide open or closed
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                listView.clearFocus();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                listView.requestFocus();
-            }
-        };
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         //listView.setItemsCanFocus(true);
 
@@ -192,7 +178,7 @@ public class NoteActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(NoteActivity.this, "Time for an upgrade!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NoteActivity.this, "TODO: Change list", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -206,9 +192,11 @@ public class NoteActivity extends AppCompatActivity {
          * Basically, this save function always happen
          * Possibility of memory leak?? Need to check for validity.
          */
-        sessionData = new SessionData();
-        sessionData.setSessionName("Temp");
-        sessionData.setWordList(array);
+
+        SessionData temp = new SessionData();
+        temp.setSessionName("123");
+        temp.setWordList(array);
+        sessionData.setSession(temp.getSessionName(),temp);
 
         ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
         File directory = contextWrapper.getDir(file, Context.MODE_PRIVATE);
@@ -227,7 +215,8 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void addDrawerItems() {
-        String[] osArray = { "Android", "iOS", "Windows", "OS X", "Linux" };
+        //fill array with session name stored using session
+        String[] osArray = { "Session1", "Session2", "Session3", "Session4", "Session5" };
         mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, osArray);
         mDrawerList.setAdapter(mAdapter);
     }

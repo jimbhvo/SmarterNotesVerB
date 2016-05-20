@@ -7,27 +7,29 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jimmy on 5/12/2016.
- */
 public class JsonUtil {
-    public static String toJson(SessionData sessionData)
+    public static String toJson(SessionDataMap sessionData)
     {
         try {
-            JSONObject jsonObj = new JSONObject();
-            jsonObj.put("sessionName", sessionData.getSessionName());
-            JSONArray jsonArr = new JSONArray();
-
-            for (String wd : sessionData.getWordList())
+            JSONArray sDataArray = new JSONArray();
+            ArrayList<SessionData> sessionArray = sessionData.getSessionList();
+            for(SessionData sd: sessionArray)
             {
-                JSONObject wdObj = new JSONObject();
-                wdObj.put("word", wd);
-                jsonArr.put(wdObj);
+                JSONObject jsonObj = new JSONObject();
+
+                jsonObj.put("sessionName", sd.getSessionName());
+                JSONArray jsonArr = new JSONArray();
+
+                for (String wd : sd.getWordList()) {
+                    JSONObject wdObj = new JSONObject();
+                    wdObj.put("word", wd);
+                    jsonArr.put(wdObj);
+                }
+
+                jsonObj.put("wordList", jsonArr);
+                sDataArray.put(jsonObj);
             }
-
-            jsonObj.put("wordList",jsonArr);
-
-            return jsonObj.toString();
+            return sDataArray.toString();
         }
         catch (JSONException ex)
         {
@@ -36,22 +38,27 @@ public class JsonUtil {
         return null;
     }
 
-    public static SessionData toSdata(String string)
+    public static SessionDataMap toSdata(String string)
     {
-        SessionData sData = new SessionData();
+        SessionDataMap sData = new SessionDataMap();
         try {
-            JSONObject jObj = new JSONObject(string);
-            sData.setSessionName(jObj.getString("sessionName"));
+            JSONArray jSessionArray = new JSONArray(string);
+            for (int iArray = 0; iArray < jSessionArray.length(); iArray++)
+            {
+                SessionData sDat = new SessionData();
+                JSONObject jObj = jSessionArray.getJSONObject(iArray);
+                sDat.setSessionName(jObj.getString("sessionName"));
 
-            JSONArray jArr = jObj.getJSONArray("wordList");
-            List<String> wordList = new ArrayList<>();
+                JSONArray jArr = jObj.getJSONArray("wordList");
+                List<String> wordList = new ArrayList<>();
 
-            for (int i=0; i < jArr.length(); i++) {
-                JSONObject obj = jArr.getJSONObject(i);
-                wordList.add(obj.getString("word"));
+                for (int i = 0; i < jArr.length(); i++) {
+                    JSONObject obj = jArr.getJSONObject(i);
+                    wordList.add(obj.getString("word"));
+                }
+                sDat.setWordList(wordList);
+                sData.setSession(sDat.getSessionName(),sDat);
             }
-            sData.setWordList(wordList);
-
             return sData;
         }
         catch (Exception e) {
