@@ -46,4 +46,6 @@ public class SessionDataMap {
     {
         return sDataMap;
     }
+
+    public ArrayList<String> getsNames(){ return sNames; }
 }

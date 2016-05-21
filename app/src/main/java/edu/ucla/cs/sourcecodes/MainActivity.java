@@ -95,12 +95,6 @@ public class MainActivity extends  Activity  {
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(3,true);
 
-        /**
-         * Now , this is a workaround ,
-         * The setupWithViewPager dose't works without the runnable .
-         * Maybe a Support Library Bug .
-         */
-
         tabLayout.post(new Runnable() {
             @Override
             public void run() {

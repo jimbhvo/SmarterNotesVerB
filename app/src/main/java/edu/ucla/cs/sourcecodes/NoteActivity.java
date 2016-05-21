@@ -216,9 +216,7 @@ public class NoteActivity extends AppCompatActivity {
 
     private void addDrawerItems() {
         //fill array with session name stored using session
-        String[] osArray = { "Session1", "Session2", "Session3", "Session4", "Session5" };
-        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, osArray);
+        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sessionData.getsNames());
         mDrawerList.setAdapter(mAdapter);
     }
-
 }
