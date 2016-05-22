@@ -134,7 +134,7 @@ public class NoteActivity extends AppCompatActivity {
 
             // try and get current session from mapping
             if (!sessionData.getCurSessionName().equals("")) {
-                for (String word : sessionData.getFirst().getWordList()) {
+                for (String word : sessionData.getSession(sessionData.getCurSessionName()).getWordList()) {
                     array.add(word);
                 }
                 getSupportActionBar().setTitle(sessionData.getCurSessionName());
@@ -282,7 +282,11 @@ public class NoteActivity extends AppCompatActivity {
 
     public void changeCurSessionName(String t)
     {
+        //change current session
         sessionData.setCurSessionName(t);
+        //update to reflect title
+        getSupportActionBar().setTitle(t);
+
     }
 
     public String getCurName()

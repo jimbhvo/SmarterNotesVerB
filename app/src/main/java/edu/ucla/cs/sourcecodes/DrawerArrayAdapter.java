@@ -3,24 +3,25 @@ package edu.ucla.cs.sourcecodes;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.os.AsyncTask;
+
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
+
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
+
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
+
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidbelieve.drawerwithswipetabs.R;
 
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class DrawerArrayAdapter extends ArrayAdapter {
 
@@ -93,6 +94,11 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                                     MA.clearArray();
                                     MA.changeCurSessionName(textValue);
                                 }
+                                else
+                                {
+                                    //if value doesn't exist
+                                    //try and open session? or give message?
+                                }
                             }
                         });
 
@@ -122,12 +128,18 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                         ListViewItem listItem = objects.get(position);
                         final NoteActivity MA = (NoteActivity) getContext();
                         if (!MA.getCurName().equals(listItem.getText())) {
-                            MA.removeSession(listItem.getText());
+                            String name = listItem.getText();
+                            MA.removeSession(name);
                             objects.remove(listItem);
                             remove(listItem);
                             notifyDataSetChanged();
-
-                            //remove from sessiondatamap?
+                            Toast.makeText(MA, "Removed session: "+ name, Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            //if it is the current one
+                            //give a message
+                            Toast.makeText(MA, "Can't delete the current session", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
