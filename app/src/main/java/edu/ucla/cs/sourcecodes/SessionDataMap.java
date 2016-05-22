@@ -48,4 +48,11 @@ public class SessionDataMap {
     }
 
     public ArrayList<String> getsNames(){ return sNames; }
+
+    public void removeSession(String S)
+    {
+        SessionData removeMe = getSession(S);
+        sNames.remove(S);
+        sDataMap.remove(removeMe);
+    }
 }

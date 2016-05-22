@@ -236,7 +236,8 @@ public class NoteActivity extends AppCompatActivity {
         sessionData.setSession(sessionName, new SessionData());
         DrawerArrayAdapter drawerArrayAdapter = (DrawerArrayAdapter)mDrawerList.getAdapter();
         drawerArrayAdapter.add(new ListViewItem(sessionName, DrawerArrayAdapter.TYPE_OBJECT));
-        drawerArrayAdapter.notifyDataSetChanged();;
+        drawerArrayAdapter.notifyDataSetChanged();
+
     }
 
     public void saveSession()
@@ -261,5 +262,20 @@ public class NoteActivity extends AppCompatActivity {
         curSessionName = t;
     }
 
+    public String getCurName()
+    {
+        return curSessionName;
+    }
+
+    public void removeSession(String sName)
+    {
+        sessionData.removeSession(sName);
+    }
+
+    public boolean sessionExist(String name)
+    {
+        ArrayList<String> names = sessionData.getsNames();
+        return names.contains(name);
+    }
 
 }

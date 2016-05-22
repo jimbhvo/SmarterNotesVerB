@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.androidbelieve.drawerwithswipetabs.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Jimmy on 5/20/2016.
@@ -51,7 +52,7 @@ public class DrawerArrayAdapter extends ArrayAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         ViewHolder viewHolder = null;
         ListViewItem listViewItem = objects.get(position);
@@ -89,11 +90,14 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                         alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 // Save new name to session
-                                MA.saveSession();
                                 String textValue = edittext.getText().toString();
-                                MA.addNewSession(textValue);
-                                MA.clearArray();
-                                MA.changeCurSessionName(textValue);
+                                if (!MA.sessionExist(textValue))
+                                {
+                                    MA.saveSession();
+                                    MA.addNewSession(textValue);
+                                    MA.clearArray();
+                                    MA.changeCurSessionName(textValue);
+                                }
                             }
                         });
 
@@ -101,6 +105,7 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 // what ever you want to do with No option.
                                 dialog.cancel();
+
                             }
                         });
                         alert.show();
@@ -119,8 +124,17 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                         //If Not Current session name
                         //Remove session from sesion list
                         //update navlist
+                        ListViewItem listItem = objects.get(position);
                         textView.setText("ababab");
+                        final NoteActivity MA = (NoteActivity) getContext();
+                        if (MA.getCurName() != listItem.getText()) {
+                            MA.removeSession(listItem.getText());
+                            objects.remove(listItem);
+                            remove(listItem);
+                            notifyDataSetChanged();
 
+                            //remove from sessiondatamap?
+                        }
                     }
                 });
             }
