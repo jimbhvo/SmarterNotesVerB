@@ -1,14 +1,12 @@
 package edu.ucla.cs.sourcecodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jimmy on 5/12/2016.
- */
 public class SessionData {
     //get and set
     private String sessionName;
-    private List<String> wordList;
+    private ArrayList<String> wordList;
 
     public void setSessionName(String name)
     {
@@ -20,9 +18,9 @@ public class SessionData {
         return sessionName;
     }
 
-    public void setWordList(List<String> list)
+    public void setWordList(ArrayList<String> list)
     {
-        wordList = list;
+        wordList = new ArrayList<>(list);
     }
 
     public List<String> getWordList()

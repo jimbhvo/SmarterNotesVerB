@@ -22,9 +22,6 @@ import com.androidbelieve.drawerwithswipetabs.R;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Jimmy on 5/20/2016.
- */
 public class DrawerArrayAdapter extends ArrayAdapter {
 
     public static final int TYPE_ADD = 0;
@@ -54,7 +51,7 @@ public class DrawerArrayAdapter extends ArrayAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
 
-        ViewHolder viewHolder = null;
+        ViewHolder viewHolder;
         ListViewItem listViewItem = objects.get(position);
         int listViewItemType = getItemViewType(position);
 
@@ -62,7 +59,7 @@ public class DrawerArrayAdapter extends ArrayAdapter {
         if (convertView == null) {
 
             if (listViewItemType == TYPE_ADD) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_drawer_add, null);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_drawer_add, parent,false);
                 textView = (TextView) convertView.findViewById(R.id.add_item_string);
 
                 Button button = (Button)convertView.findViewById(R.id.drawer_add_btn);
@@ -75,8 +72,6 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                         //add to array? (this.add(new Listview etc)
                         //update sessiondatamap (for save purposes)
                         //switch current array to new session + change session name
-
-                        //TODO: If existing name exist, then just switch to it????
                         final NoteActivity MA = (NoteActivity) getContext();
 
                         final EditText edittext = new EditText(MA.getApplicationContext());
@@ -114,7 +109,7 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                 });
 
             } else {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_drawer_layout, null);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_drawer_layout, parent,false);
                 textView = (TextView) convertView.findViewById(R.id.list_item_string);
 
                 Button button = (Button)convertView.findViewById(R.id.delete_btn);
@@ -125,9 +120,8 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                         //Remove session from sesion list
                         //update navlist
                         ListViewItem listItem = objects.get(position);
-                        textView.setText("ababab");
                         final NoteActivity MA = (NoteActivity) getContext();
-                        if (MA.getCurName() != listItem.getText()) {
+                        if (!MA.getCurName().equals(listItem.getText())) {
                             MA.removeSession(listItem.getText());
                             objects.remove(listItem);
                             remove(listItem);

@@ -50,7 +50,7 @@ public class JsonUtil {
                 sDat.setSessionName(jObj.getString("sessionName"));
 
                 JSONArray jArr = jObj.getJSONArray("wordList");
-                List<String> wordList = new ArrayList<>();
+                ArrayList<String> wordList = new ArrayList<>();
 
                 for (int i = 0; i < jArr.length(); i++) {
                     JSONObject obj = jArr.getJSONObject(i);

@@ -81,8 +81,7 @@ public class NoteActivity extends AppCompatActivity {
                         array.add(textValue);
                         Log.d("MYTAG", textValue);
                         if (array != null) {
-                            values = array.toArray(new String[array.size()]);
-                            ArrayAdapter<String> adapter  = new ArrayAdapter<>(getApplicationContext(), R.layout.listview_layout, android.R.id.text1, values);
+                            ArrayAdapter<String> adapter  = new ArrayAdapter<>(getApplicationContext(), R.layout.listview_layout, android.R.id.text1, array);
                             listView.setAdapter(adapter);
 
 
@@ -143,8 +142,7 @@ public class NoteActivity extends AppCompatActivity {
             curSessionName = sessionData.getFirst().getSessionName();
 
             //set adapter for loaded words
-            values = array.toArray(new String[array.size()]);
-            ArrayAdapter<String> adapter  = new ArrayAdapter<>(getApplicationContext(), R.layout.listview_layout, android.R.id.text1, values);
+            ArrayAdapter<String> adapter  = new ArrayAdapter<>(getApplicationContext(), R.layout.listview_layout, android.R.id.text1, array);
             listView.setAdapter(adapter);
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -217,7 +215,7 @@ public class NoteActivity extends AppCompatActivity {
 
         //Update drawer here with sessions found
         mDrawerList = (ListView)findViewById(R.id.navList);
-        DrawerArrayAdapter drawerArrayAdapter = new DrawerArrayAdapter(this, R.id.text, items);
+        final DrawerArrayAdapter drawerArrayAdapter = new DrawerArrayAdapter(this, R.id.text, items);
 
         mDrawerList.setAdapter(drawerArrayAdapter);
 
@@ -226,7 +224,23 @@ public class NoteActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Switch the session to the new one?
                 //And close the drawer if we can?
-                Toast.makeText(NoteActivity.this, "TODO: Change list", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NoteActivity.this, "TODO: Change list to " + Integer.toString(position), Toast.LENGTH_SHORT).show();
+
+                //save current array and stuff
+                saveSession();
+
+                //change current session name to the one clicked
+                ListViewItem curListView = (ListViewItem) drawerArrayAdapter.getItem(position);
+                curSessionName = curListView.getText();
+                SessionData curData = sessionData.getSession(curListView.getText());
+
+                //switch array to new one
+                //TODO: Find out why switching shit doesn't work
+                clearArray();
+                for (String word : curData.getWordList()) {
+                    array.add(word);
+                }
+                ((ArrayAdapter<String>) listView.getAdapter()).notifyDataSetChanged();
             }
         });
     }
@@ -253,8 +267,7 @@ public class NoteActivity extends AppCompatActivity {
     {
         //clear the current array and reflect it in the adapter
         array.clear();
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>)listView.getAdapter();
-        adapter.clear();
+        ((ArrayAdapter<String>) listView.getAdapter()).notifyDataSetChanged();
     }
 
     public void changeCurSessionName(String t)
