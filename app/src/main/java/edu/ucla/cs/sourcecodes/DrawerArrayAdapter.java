@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 
 import android.view.LayoutInflater;
@@ -93,6 +94,8 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                                     MA.addNewSession(textValue);
                                     MA.clearArray();
                                     MA.changeCurSessionName(textValue);
+                                    DrawerLayout mDrawerLayout = (DrawerLayout) MA.findViewById(R.id.drawerLayout);
+                                    mDrawerLayout.closeDrawers();
                                 }
                                 else
                                 {
