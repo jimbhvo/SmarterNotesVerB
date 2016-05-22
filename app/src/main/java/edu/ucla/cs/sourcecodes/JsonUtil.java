@@ -11,10 +11,16 @@ public class JsonUtil {
     public static String toJson(SessionDataMap sessionData)
     {
         try {
+
+            JSONObject sessionPackage = new JSONObject();
+
+            //store cur session name
+            sessionPackage.put("currentSession",sessionData.getCurSessionName());
+
+            //package json array for session data
             JSONArray sDataArray = new JSONArray();
             ArrayList<SessionData> sessionArray = sessionData.getSessionList();
-            for(SessionData sd: sessionArray)
-            {
+            for (SessionData sd : sessionArray) {
                 JSONObject jsonObj = new JSONObject();
 
                 jsonObj.put("sessionName", sd.getSessionName());
@@ -29,7 +35,11 @@ public class JsonUtil {
                 jsonObj.put("wordList", jsonArr);
                 sDataArray.put(jsonObj);
             }
-            return sDataArray.toString();
+
+            //put in session data
+            sessionPackage.put("sessionData",sDataArray);
+
+            return sessionPackage.toString();
         }
         catch (JSONException ex)
         {
@@ -42,7 +52,9 @@ public class JsonUtil {
     {
         SessionDataMap sData = new SessionDataMap();
         try {
-            JSONArray jSessionArray = new JSONArray(string);
+            JSONObject sessionPackage = new JSONObject(string);
+            sData.setCurSessionName(sessionPackage.getString("currentSession"));
+            JSONArray jSessionArray = sessionPackage.getJSONArray("sessionData");
             for (int iArray = 0; iArray < jSessionArray.length(); iArray++)
             {
                 SessionData sDat = new SessionData();

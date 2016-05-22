@@ -8,13 +8,12 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -38,7 +37,6 @@ public class NoteActivity extends AppCompatActivity {
     private ListView mDrawerList;
     private View mContentView = null;
     private SessionDataMap sessionData;
-    private String curSessionName;
     private ArrayList<ListViewItem> items;
     ListView listView;
     String[] values;
@@ -134,12 +132,20 @@ public class NoteActivity extends AppCompatActivity {
             }
 
 
-            // Get first session from mapping
-
-            for (String word : sessionData.getFirst().getWordList()) {
-                array.add(word);
+            // try and get current session from mapping
+            if (!sessionData.getCurSessionName().equals("")) {
+                for (String word : sessionData.getFirst().getWordList()) {
+                    array.add(word);
+                }
+                getSupportActionBar().setTitle(sessionData.getCurSessionName());
             }
-            curSessionName = sessionData.getFirst().getSessionName();
+            else
+            {
+                //Assume that we didn't load anything from SessionData
+                //Load this for new file first made
+                sessionData.setCurSessionName("Temp");
+                sessionData.setSession("Temp",new SessionData());
+            }
 
             //set adapter for loaded words
             ArrayAdapter<String> adapter  = new ArrayAdapter<>(getApplicationContext(), R.layout.listview_layout, android.R.id.text1, array);
@@ -222,25 +228,29 @@ public class NoteActivity extends AppCompatActivity {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Switch the session to the new one?
-                //And close the drawer if we can?
-                Toast.makeText(NoteActivity.this, "TODO: Change list to " + Integer.toString(position), Toast.LENGTH_SHORT).show();
+                if (position != 0) {
+                    //save current array and stuff
+                    saveSession();
 
-                //save current array and stuff
-                saveSession();
+                    //change current session name to the one clicked
+                    ListViewItem curListView = (ListViewItem) drawerArrayAdapter.getItem(position);
 
-                //change current session name to the one clicked
-                ListViewItem curListView = (ListViewItem) drawerArrayAdapter.getItem(position);
-                curSessionName = curListView.getText();
-                SessionData curData = sessionData.getSession(curListView.getText());
+                    sessionData.setCurSessionName(curListView.getText());
+                    getSupportActionBar().setTitle(curListView.getText());
 
-                //switch array to new one
-                //TODO: Find out why switching shit doesn't work
-                clearArray();
-                for (String word : curData.getWordList()) {
-                    array.add(word);
+                    SessionData curData = sessionData.getSession(curListView.getText());
+
+                    //switch array to new one
+                    clearArray();
+                    for (String word : curData.getWordList()) {
+                        array.add(word);
+                    }
+                    ((ArrayAdapter<String>) listView.getAdapter()).notifyDataSetChanged();
+
+                    //close the drawer
+                    DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+                    mDrawerLayout.closeDrawers();
                 }
-                ((ArrayAdapter<String>) listView.getAdapter()).notifyDataSetChanged();
             }
         });
     }
@@ -257,7 +267,7 @@ public class NoteActivity extends AppCompatActivity {
     public void saveSession()
     {
         SessionData temp = new SessionData();
-        temp.setSessionName(curSessionName);
+        temp.setSessionName(sessionData.getCurSessionName());
         temp.setWordList(array);
         sessionData.setSession(temp.getSessionName(),temp);
 
@@ -272,12 +282,12 @@ public class NoteActivity extends AppCompatActivity {
 
     public void changeCurSessionName(String t)
     {
-        curSessionName = t;
+        sessionData.setCurSessionName(t);
     }
 
     public String getCurName()
     {
-        return curSessionName;
+        return sessionData.getCurSessionName();
     }
 
     public void removeSession(String sName)

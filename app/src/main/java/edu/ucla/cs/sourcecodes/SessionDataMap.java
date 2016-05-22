@@ -6,11 +6,13 @@ import java.util.ArrayList;
 public class SessionDataMap {
     private ArrayList<String> sNames;
     private ArrayList<SessionData> sDataMap;
+    private String curSessionName;
 
     public SessionDataMap()
     {
         sNames = new ArrayList<>();
         sDataMap = new ArrayList<>();
+        curSessionName = "";
     }
 
     public void setSession(String s, SessionData sData)
@@ -55,4 +57,8 @@ public class SessionDataMap {
         sNames.remove(S);
         sDataMap.remove(removeMe);
     }
+
+    public void setCurSessionName(String s){curSessionName = s;}
+
+    public String getCurSessionName(){return curSessionName;}
 }
