@@ -159,8 +159,6 @@ public class NoteActivity extends AppCompatActivity {
             });
         }
 
-        //Update drawer here with sessions found
-        mDrawerList = (ListView)findViewById(R.id.navList);
 
         //add action buttom for drawer on this
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -173,14 +171,6 @@ public class NoteActivity extends AppCompatActivity {
 
         toggle.syncState();
         addDrawerItems();
-
-        //on item click, do something
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(NoteActivity.this, "TODO: Change list", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     @Override
@@ -216,7 +206,26 @@ public class NoteActivity extends AppCompatActivity {
 
     private void addDrawerItems() {
         //fill array with session name stored using session
-        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, sessionData.getsNames());
-        mDrawerList.setAdapter(mAdapter);
+        ListViewItem[] items = new ListViewItem[sessionData.getLength()+1];
+        items[0] = new ListViewItem("Click To Add Text", DrawerArrayAdapter.TYPE_ADD);
+
+        ArrayList<String> fileNames = sessionData.getsNames();
+
+        for (int i = 0; i < sessionData.getLength(); i++)
+        {
+            items[i+1] = new ListViewItem(fileNames.get(i),DrawerArrayAdapter.TYPE_OBJECT);
+        }
+
+        //Update drawer here with sessions found
+        mDrawerList = (ListView)findViewById(R.id.navList);
+        DrawerArrayAdapter drawerArrayAdapter = new DrawerArrayAdapter(this, R.id.text, items);
+        mDrawerList.setAdapter(drawerArrayAdapter);
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(NoteActivity.this, "TODO: Change list", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

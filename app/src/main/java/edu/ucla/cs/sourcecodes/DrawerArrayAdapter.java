@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListAdapter;
@@ -16,68 +17,77 @@ import java.util.ArrayList;
 /**
  * Created by Jimmy on 5/20/2016.
  */
-public class DrawerArrayAdapter extends BaseAdapter implements ListAdapter{
-    private ArrayList<String> list = new ArrayList<>();
-    private Context context;
+public class DrawerArrayAdapter extends ArrayAdapter {
 
-    public DrawerArrayAdapter(ArrayList<String> list, Context context) {
-        this.list = list;
-        this.context = context;
-        //insert special case at slot 0
-        list.add(0,"Add a new Session");
+    public static final int TYPE_ADD = 0;
+    public static final int TYPE_OBJECT = 1;
+
+
+    private ListViewItem[] objects;
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
     }
 
     @Override
-    public int getCount() {
-        return list.size();
+    public int getItemViewType(int position) {
+        return objects[position].getType();
+    }
+
+    public DrawerArrayAdapter(Context context, int resource, ListViewItem[] objects) {
+        super(context, resource, objects);
+        this.objects = objects;
     }
 
     @Override
-    public Object getItem(int pos) {
-        return list.get(pos);
-    }
+    public View getView(int position, View convertView, ViewGroup parent) {
 
-    @Override
-    public long getItemId(int pos) {
-        return pos;
-    }
+        ViewHolder viewHolder = null;
+        ListViewItem listViewItem = objects[position];
+        int listViewItemType = getItemViewType(position);
 
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        View view = convertView;
+        final TextView textView;
+        if (convertView == null) {
 
-        if (view == null) {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.custom_drawer_layout, null);
+            if (listViewItemType == TYPE_ADD) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_drawer_add, null);
+                textView = (TextView) convertView.findViewById(R.id.add_item_string);
+
+                Button button = (Button)convertView.findViewById(R.id.drawer_add_btn);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //do stuff?
+                        textView.setText("obobobob");
+                    }
+                });
+
+            } else {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.custom_drawer_layout, null);
+                textView = (TextView) convertView.findViewById(R.id.list_item_string);
+
+                Button button = (Button)convertView.findViewById(R.id.delete_btn);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //do stuff?
+                        textView.setText("ababab");
+                    }
+                });
+            }
+
+            viewHolder = new ViewHolder(textView);
+
+            convertView.setTag(viewHolder);
+
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        //Handle TextView and display string from your list
-        TextView listItemText = (TextView)view.findViewById(R.id.list_item_string);
-        listItemText.setText(list.get(position));
-        TextView addItemText = (TextView)view.findViewById(R.id.add_item_string);
-        addItemText.setText(list.get(0));
+        viewHolder.getText().setText(listViewItem.getText());
 
-        //Handle buttons and add onClickListeners
-        Button deleteBtn = (Button)view.findViewById(R.id.delete_btn);
-        Button addBtn = (Button)view.findViewById(R.id.drawer_add_btn);
-
-        addBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                //do something
-                //TODO: Remove session that was deleted IF IT'S NOT CURRENT SESSION
-            }
-        });
-
-        deleteBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                //do something
-                //TODO: Remove session that was deleted IF IT'S NOT CURRENT SESSION
-            }
-        });
-
-        return view;
+        return convertView;
     }
 
 }
