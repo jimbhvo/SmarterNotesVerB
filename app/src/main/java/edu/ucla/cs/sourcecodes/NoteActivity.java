@@ -36,13 +36,14 @@ import java.util.ArrayList;
 
 public class NoteActivity extends AppCompatActivity {
     private ListView mDrawerList;
-    private ArrayAdapter<String> mAdapter;
     private View mContentView = null;
     private SessionDataMap sessionData;
+    private String curSessionName;
+    private ArrayList<ListViewItem> items;
     ListView listView;
     String[] values;
 
-    ArrayList<String> array;
+    private ArrayList<String> array;
 
     private String file = "mydata2";
 
@@ -135,10 +136,11 @@ public class NoteActivity extends AppCompatActivity {
 
 
             // Get first session from mapping
-            if (sessionData.getLength() > 0)
-                for (String word : sessionData.getFirst().getWordList()) {
-                    array.add(word);
-                }
+
+            for (String word : sessionData.getFirst().getWordList()) {
+                array.add(word);
+            }
+            curSessionName = sessionData.getFirst().getSessionName();
 
             //set adapter for loaded words
             values = array.toArray(new String[array.size()]);
@@ -183,10 +185,7 @@ public class NoteActivity extends AppCompatActivity {
          * Possibility of memory leak?? Need to check for validity.
          */
 
-        SessionData temp = new SessionData();
-        temp.setSessionName("123");
-        temp.setWordList(array);
-        sessionData.setSession(temp.getSessionName(),temp);
+        saveSession();
 
         ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
         File directory = contextWrapper.getDir(file, Context.MODE_PRIVATE);
@@ -206,26 +205,61 @@ public class NoteActivity extends AppCompatActivity {
 
     private void addDrawerItems() {
         //fill array with session name stored using session
-        ListViewItem[] items = new ListViewItem[sessionData.getLength()+1];
-        items[0] = new ListViewItem("Click To Add Text", DrawerArrayAdapter.TYPE_ADD);
+        items = new ArrayList<>();
+        items.add(new ListViewItem("Add Session", DrawerArrayAdapter.TYPE_ADD));
 
         ArrayList<String> fileNames = sessionData.getsNames();
 
         for (int i = 0; i < sessionData.getLength(); i++)
         {
-            items[i+1] = new ListViewItem(fileNames.get(i),DrawerArrayAdapter.TYPE_OBJECT);
+            items.add(new ListViewItem(fileNames.get(i),DrawerArrayAdapter.TYPE_OBJECT));
         }
 
         //Update drawer here with sessions found
         mDrawerList = (ListView)findViewById(R.id.navList);
         DrawerArrayAdapter drawerArrayAdapter = new DrawerArrayAdapter(this, R.id.text, items);
+
         mDrawerList.setAdapter(drawerArrayAdapter);
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Switch the session to the new one?
+                //And close the drawer if we can?
                 Toast.makeText(NoteActivity.this, "TODO: Change list", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    public void addNewSession(String sessionName)
+    {
+        sessionData.setSession(sessionName, new SessionData());
+        DrawerArrayAdapter drawerArrayAdapter = (DrawerArrayAdapter)mDrawerList.getAdapter();
+        drawerArrayAdapter.add(new ListViewItem(sessionName, DrawerArrayAdapter.TYPE_OBJECT));
+        drawerArrayAdapter.notifyDataSetChanged();;
+    }
+
+    public void saveSession()
+    {
+        SessionData temp = new SessionData();
+        temp.setSessionName(curSessionName);
+        temp.setWordList(array);
+        sessionData.setSession(temp.getSessionName(),temp);
+
+    }
+
+    public void clearArray()
+    {
+        //clear the current array and reflect it in the adapter
+        array.clear();
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>)listView.getAdapter();
+        adapter.clear();
+    }
+
+    public void changeCurSessionName(String t)
+    {
+        curSessionName = t;
+    }
+
+
 }

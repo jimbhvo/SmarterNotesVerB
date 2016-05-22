@@ -1,12 +1,19 @@
 package edu.ucla.cs.sourcecodes;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Color;
+import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
@@ -21,9 +28,10 @@ public class DrawerArrayAdapter extends ArrayAdapter {
 
     public static final int TYPE_ADD = 0;
     public static final int TYPE_OBJECT = 1;
+    final private AlertDialog.Builder alert;
 
 
-    private ListViewItem[] objects;
+    private ArrayList<ListViewItem> objects;
 
     @Override
     public int getViewTypeCount() {
@@ -32,19 +40,21 @@ public class DrawerArrayAdapter extends ArrayAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return objects[position].getType();
+        return objects.get(position).getType();
     }
 
-    public DrawerArrayAdapter(Context context, int resource, ListViewItem[] objects) {
+    public DrawerArrayAdapter(Context context, int resource, ArrayList<ListViewItem> objects) {
         super(context, resource, objects);
         this.objects = objects;
+        alert = new AlertDialog.Builder(context);
+
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder viewHolder = null;
-        ListViewItem listViewItem = objects[position];
+        ListViewItem listViewItem = objects.get(position);
         int listViewItemType = getItemViewType(position);
 
         final TextView textView;
@@ -58,8 +68,43 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //do stuff?
-                        textView.setText("obobobob");
+                        //Add new session
+                        //Create a new alert dialogue
+                        //save current array to current session
+                        //add to array? (this.add(new Listview etc)
+                        //update sessiondatamap (for save purposes)
+                        //switch current array to new session + change session name
+
+                        //TODO: If existing name exist, then just switch to it????
+                        final NoteActivity MA = (NoteActivity) getContext();
+
+                        final EditText edittext = new EditText(MA.getApplicationContext());
+                        edittext.setTextColor(Color.BLACK);
+
+                        alert.setMessage("Enter A Name");
+                        alert.setTitle("Add a new session");
+
+                        alert.setView(edittext);
+
+                        alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                // Save new name to session
+                                MA.saveSession();
+                                String textValue = edittext.getText().toString();
+                                MA.addNewSession(textValue);
+                                MA.clearArray();
+                                MA.changeCurSessionName(textValue);
+                            }
+                        });
+
+                        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                // what ever you want to do with No option.
+                                dialog.cancel();
+                            }
+                        });
+                        alert.show();
+
                     }
                 });
 
@@ -71,8 +116,11 @@ public class DrawerArrayAdapter extends ArrayAdapter {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //do stuff?
+                        //If Not Current session name
+                        //Remove session from sesion list
+                        //update navlist
                         textView.setText("ababab");
+
                     }
                 });
             }
